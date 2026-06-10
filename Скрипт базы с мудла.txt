@@ -1,0 +1,40 @@
+create schema if not exists moodles_exam;
+
+create table moodles_exam.roles (
+id serial primary key,
+name varchar(30) unique not null
+);
+
+create table moodles_exam.users (
+id serial primary key,
+username varchar(50) unique not null,
+email varchar(100) unique not null,
+password varchar(255) not null,
+role_id integer not null references moodles_exam.roles(id)
+);
+
+create table moodles_exam.products (
+id serial primary key,
+name varchar(150) not null,
+description text,
+price numeric(10,2) not null check (price >= 0),
+quantity integer not null default 0 check (quantity >= 0),
+supplier varchar(150),
+created_at timestamp default current_timestamp
+);
+
+create table moodles_exam.operations (
+id serial primary key,
+product_id integer not null references moodles_exam.products(id) on delete cascade,
+type varchar(20) not null check (type in ('supply', 'sale')),
+quantity integer not null check (quantity > 0),
+operation_date timestamp default current_timestamp
+);
+
+insert into moodles_exam.roles (name) values ('admin'), ('user');
+
+insert into moodles_exam.products (name, description, price, quantity, supplier) values
+('Хлеб Хлебный Дом Геркулес с отрубями, 250г', 'Хлеб нарезанный', 51.90, 10, 'Хлебный Дом'),
+('Хлеб Harrys American Sandwich, 470г', 'Пшеничный хлеб', 89.90, 15, 'Harrys'),
+('Лепешки Mission, 250г', 'Тортильи пшеничные', 65.00, 20, 'Mission'),
+('Лаваш Черемушки Армянский тонкий, 200г', 'Лаваш тонкий', 49.90, 12, 'Черемушки');
